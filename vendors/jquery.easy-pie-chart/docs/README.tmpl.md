@@ -1,4 +1,5 @@
-# {%= name %}
+# Name
+{%= name %}
 
 > {%= description %}
 

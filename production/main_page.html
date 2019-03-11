@@ -32,6 +32,23 @@
 
     <!-- Custom Theme Style -->
     <link href="../build/css/custom.min.css" rel="stylesheet">
+    
+    <script src="https://www.gstatic.com/firebasejs/4.9.1/firebase.js"></script>
+    <script>
+        // Initialize Firebase
+        var config = {
+          apiKey: "AIzaSyDTCVMs_QUISJK-4x6up5VmIcBk1himBwU",
+          authDomain: "gsmfestival-c19c2.firebaseapp.com",
+          databaseURL: "https://gsmfestival-c19c2.firebaseio.com",
+          projectId: "gsmfestival-c19c2",
+          storageBucket: "gsmfestival-c19c2.appspot.com",
+          messagingSenderId: "195670326271"
+        };
+        firebase.initializeApp(config);
+
+        
+        var database = firebase.database();
+      </script>
 
   </head>
 
@@ -142,13 +159,13 @@
                 <canvas id="myChart" width="100" height="30"></canvas>
                 <script>
                   var ctx = document.getElementById("myChart").getContext('2d');
-                  var myChart = new Chart(ctx, {
+                  var myChartinfo = {
                       type: 'bar',
                       data: {
                           labels: ["월", "화", "수", "목", "금", "토", "일"],
                           datasets: [{
                               label: '# of Votes',
-                              data: [12, 19, 3, 5, 2, 3, 10],
+                              data: [],
                               backgroundColor: [
                                   'rgba(200, 60, 40, 0.3)',
                                   'rgba(54, 162, 235, 0.2)',
@@ -179,7 +196,19 @@
                               }]
                           }
                       }
+                  }
+
+                  var dbTestRef = database.ref('St_P2/');
+                  dbTestRef.on('child_added', function(data){
+                  console.log(data.val().PM10_max);
+                  myChartinfo.data.datasets[0].data.push(12);
                   });
+
+                  var myChart = new Chart(ctx, myChartinfo);
+
+                  
+
+                  
                 </script>
 
                 <div class="clearfix"></div>

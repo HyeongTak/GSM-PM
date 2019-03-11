@@ -152,7 +152,7 @@
 
                 <div class="row x_title">
                   <div class="col-md-6">
-                    <h3>주간 미세먼지 농도 추이 <small>Graph title sub-title</small></h3>
+                    <h3>주간 미세먼지 농도 추이 <small>최댓값</small></h3>
                   </div>
                 </div>
 
@@ -199,12 +199,27 @@
                   }
 
                   var dbTestRef = database.ref('St_P2/');
-                  dbTestRef.on('child_added', function(data){
-                  console.log(data.val().PM10_max);
-                  myChartinfo.data.datasets[0].data.push(12);
-                  });
 
-                  var myChart = new Chart(ctx, myChartinfo);
+                  
+                  function getData(callback){
+                    return new Promise(function (resolve, reject) {
+                      dbTestRef.on('child_added', function(data){
+                        var i = data.val().PM10_max;
+                        myChartinfo.data.datasets[0].data.push(i);
+                      });
+                      check = setInterval(function() {
+                        console.log(myChartinfo.data.datasets[0].data.length);
+                        if(myChartinfo.data.datasets[0].data.length == 7){
+                          resolve();
+                        }
+                      }, 100);
+                    });
+                  }
+                  
+                  getData().then(function(){
+                    clearInterval(check);
+                    var myChart = new Chart(ctx, myChartinfo);
+                  });
 
                   
 
@@ -214,6 +229,8 @@
                 <div class="clearfix"></div>
               </div>
             </div>
+
+            
 
           </div>
           <br />

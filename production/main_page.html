@@ -32,6 +32,7 @@
 
     <!-- Custom Theme Style -->
     <link href="../build/css/custom.min.css" rel="stylesheet">
+
   </head>
 
   <body class="nav-md">
@@ -202,6 +203,7 @@
                       <div class="chartjs-wrapper">
                           <canvas class="chartjs-gauge"></canvas>
                       </div>
+                      <div id="dust" style="text-align: center;font-size: xx-large;">350㎍/㎥</div>
                     <script>
                       var ctx2 = document.getElementsByClassName("chartjs-gauge");
                       var chart = new Chart(ctx2, {
@@ -212,9 +214,9 @@
                                   label: "Gauge",
                                   data : [10, 190],
                                   backgroundColor: [
-                                      "rgb(255, 99, 132)",
-                                      "rgb(54, 162, 235)",
-                                      "rgb(255, 205, 86)"
+                                      "rgb(120,120,120)",
+                                      "rgb(230,230,230)",
+                                      "rgb(120,120,120)"
                                   ]
                               }]
                           },
@@ -262,11 +264,25 @@
 
                       // DEMO Code: not relevant to example
                       function change_gauge(chart, label, data){
+                        var dust = document.getElementById('dust');
                         chart.data.datasets.forEach((dataset) => {
                           if(dataset.label == label){
                             dataset.data = data;
-                          }  
+                          }
                         });
+                        if(chart.data.datasets[0].data[0] <= 60){
+                          chart.data.datasets[0].backgroundColor[0] = "rgb(74,215,47)";
+                          dust.style.color = "rgb(74,215,47)";
+                        }
+                        else if(chart.data.datasets[0].data[0] <= 100){
+                          chart.data.datasets[0].backgroundColor[0] = "rgb(255,216,56)";
+                          dust.style.color = "rgb(255,216,56)";
+                        }
+                        else{
+                          chart.data.datasets[0].backgroundColor[0] = "rgb(255,60,56)";
+                          dust.style.color = "rgb(255,60,56)";
+                        }
+                        dust.innerHTML = chart.data.datasets[0].data[0]+"㎍/㎥";
                         chart.update();
                       }
 

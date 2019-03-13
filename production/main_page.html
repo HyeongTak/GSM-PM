@@ -145,7 +145,7 @@
                   <div class="chartjs-wrapper">
                     <canvas class="chartjs-gauge" id="chartjs-gauge1"></canvas>
                   </div>
-                  <div id="dust" style="text-align: center;font-size: xx-large;color:rgb(74,215,47);">10㎍/㎥</div>
+                  <div id="dust1" style="text-align: center;font-size: xx-large;color:rgb(74,215,47);">10㎍/㎥</div>
                 </div>
               </div>
             </div>
@@ -163,7 +163,7 @@
                     <div class="chartjs-wrapper">
                       <canvas class="chartjs-gauge" id="chartjs-gauge2"></canvas>
                     </div>
-                    <div id="dust" style="text-align: center;font-size: xx-large;color:rgb(74,215,47);">10㎍/㎥</div>
+                    <div id="dust2" style="text-align: center;font-size: xx-large;color:rgb(74,215,47);">10㎍/㎥</div>
                   </div>
                 </div>
               </div>
@@ -181,7 +181,7 @@
                       <div class="chartjs-wrapper">
                         <canvas class="chartjs-gauge" id="chartjs-gauge3"></canvas>
                       </div>
-                      <div id="dust" style="text-align: center;font-size: xx-large;color:rgb(74,215,47);">10㎍/㎥</div>
+                      <div id="dust3" style="text-align: center;font-size: xx-large;color:rgb(74,215,47);">10㎍/㎥</div>
                     </div>
                   </div>
                 </div>
@@ -199,7 +199,7 @@
                     labels: ["Red", "Blue"],
                     datasets: [{
                       label: "Gauge",
-                      data: [10, 190],
+                      data: [0,300],
                       backgroundColor: [
                         "rgb(74,215,47)",
                         "rgb(230,230,230)",
@@ -254,7 +254,7 @@
                     labels: ["Red", "Blue"],
                     datasets: [{
                       label: "Gauge",
-                      data: [10, 190],
+                      data: [0,300],
                       backgroundColor: [
                         "rgb(74,215,47)",
                         "rgb(230,230,230)",
@@ -309,7 +309,7 @@
                     labels: ["Red", "Blue"],
                     datasets: [{
                       label: "Gauge",
-                      data: [10, 190],
+                      data: [0,300],
                       backgroundColor: [
                         "rgb(74,215,47)",
                         "rgb(230,230,230)",
@@ -360,51 +360,79 @@
 
 
                 // DEMO Code: not relevant to example
-                function change_gauge(chart, label, data) {
-                  var dust = document.getElementById('dust');
-                  chart.data.datasets.forEach((dataset) => {
-                    if (dataset.label == label) {
-                      dataset.data = data;
-                    }
-                  });
-                  if (chart.data.datasets[0].data[0] <= 80) {
-                    chart.data.datasets[0].backgroundColor[0] = "rgb(74,215,47)";
-                    dust.style.color = "rgb(74,215,47)";
+                function change_gauge() {
+                  var dust1 = document.getElementById('dust1');
+                  var dust2 = document.getElementById('dust2');
+                  var dust3 = document.getElementById('dust3');
+                  var P2Ref = database.ref('P2/');
+
+                  return new Promise(function (resolve, reject) {
+                    P2Ref.on('child_added', function(data){
+                        var d = data.val();
+                        gauge1.data.datasets[0].data = [d.PM1, 300-d.PM1];
+                        gauge2.data.datasets[0].data = [d.PM2_5, 300-d.PM2_5];
+                        gauge3.data.datasets[0].data = [d.PM10, 300-d.PM10];
+
+                        dust1.innerHTML = d.PM1+"㎍/㎥";
+                        dust2.innerHTML = d.PM2_5+"㎍/㎥";
+                        dust3.innerHTML = d.PM10+"㎍/㎥";
+
+                        if(d.PM1 <= 25){
+                          gauge1.data.datasets[0].backgroundColor[0] = "rgb(74,215,47)";
+                          dust1.style.color = "rgb(74,215,47)";
+                        }
+                        else if(d.PM1 <= 50){
+                          gauge1.data.datasets[0].backgroundColor[0] = "rgb(255,216,56)";
+                          dust1.style.color = "rgb(255,216,56)";
+                        }
+                        else{
+                          gauge1.data.datasets[0].backgroundColor[0] = "rgb(255,60,56)";
+                          dust1.style.color = "rgb(255,60,56)";
+                        }
+
+                        if(d.PM2_5 <= 25){
+                          gauge2.data.datasets[0].backgroundColor[0] = "rgb(74,215,47)";
+                          dust2.style.color = "rgb(74,215,47)";
+                        }
+                        else if(d.PM2_5 <= 50){
+                          gauge2.data.datasets[0].backgroundColor[0] = "rgb(255,216,56)";
+                          dust2.style.color = "rgb(255,216,56)";
+                        }
+                        else{
+                          gauge2.data.datasets[0].backgroundColor[0] = "rgb(255,60,56)";
+                          dust2.style.color = "rgb(255,60,56)";
+                        }
+
+                        if(d.PM10 <= 50){
+                          gauge3.data.datasets[0].backgroundColor[0] = "rgb(74,215,47)";
+                          dust3.style.color = "rgb(74,215,47)";
+                        }
+                        else if(d.PM10 <= 100){
+                          gauge3.data.datasets[0].backgroundColor[0] = "rgb(255,216,56)";
+                          dust3.style.color = "rgb(255,216,56)";
+                        }
+                        else{
+                          gauge3.data.datasets[0].backgroundColor[0] = "rgb(255,60,56)";
+                          dust3.style.color = "rgb(255,60,56)";
+                        }
+
+
+                        gauge1.update();
+                        gauge2.update();
+                        gauge3.update();
+                      });
+                      
+                      resolve();
+                    });
                   }
-                  else if (chart.data.datasets[0].data[0] <= 100) {
-                    chart.data.datasets[0].backgroundColor[0] = "rgb(255,216,56)";
-                    dust.style.color = "rgb(255,216,56)";
-                  }
-                  else {
-                    chart.data.datasets[0].backgroundColor[0] = "rgb(255,60,56)";
-                    dust.style.color = "rgb(255,60,56)";
-                  }
-                  dust.innerHTML = chart.data.datasets[0].data[0] + "㎍/㎥";
-                  chart.update();
-                }
+
 
                 var accelerating = false;
                 function accelerate() {
                   accelerating = false;
                   window.setTimeout(function () {
-                    change_gauge(gauge1 , "Gauge", [20, 140])
+                    change_gauge();
                   }, 1000);
-
-                  window.setTimeout(function () {
-                    change_gauge(gauge2, "Gauge", [60, 140])
-                  }, 2000);
-
-                  window.setTimeout(function () {
-                    change_gauge(gauge3, "Gauge", [100, 100])
-                  }, 3000);
-
-                  window.setTimeout(function () {
-                    change_gauge(chart, "Gauge", [180, 20])
-                  }, 4000);
-
-                  window.setTimeout(function () {
-                    change_gauge(chart, "Gauge", [200, 0])
-                  }, 5000);
                 }
 
                 // Start sequence
@@ -414,7 +442,7 @@
                     acelerating = true;
                     accelerate();
                   }
-                }, 6000);
+                }, 1000);
               </script>
 
         </div>
